@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contract Review</title>
+  <!-- Optional web font; falls back to system fonts when offline -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 3v5h5"/>
+          <path d="m9 14 2 2 4-4"/>
+        </svg>
+      </span>
+      <h1>Contract Review</h1>
+    </div>
+    <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Answers from your contract</span>
+  </header>
+
+  <main class="layout">
+    <!-- Left column: contract -->
+    <section class="panel contract-panel" aria-label="Contract">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <h2>Contract</h2>
+          <span class="file-chip" id="file-chip" hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 3v5h5"/>
+            </svg>
+            <span class="file-name" id="file-name"></span>
+            <span class="file-size" id="file-size"></span>
+          </span>
+        </div>
+        <div class="panel-actions" id="file-actions" hidden>
+          <a class="text-button" id="open-link" href="#" target="_blank" rel="noopener">Open in new tab</a>
+          <button type="button" class="text-button" id="replace-file">Replace</button>
+          <button type="button" class="text-button danger" id="remove-file">Remove</button>
+        </div>
+      </div>
+
+      <div class="contract-body" id="contract-body">
+        <!-- Upload area -->
+        <div class="dropzone" id="dropzone" tabindex="0" role="button"
+             aria-label="Upload a PDF contract">
+          <span class="dropzone-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 3v5h5"/>
+              <path d="M12 17v-6"/>
+              <path d="m9.5 13.5 2.5-2.5 2.5 2.5"/>
+            </svg>
+          </span>
+          <p class="dropzone-title">Upload a contract</p>
+          <p class="dropzone-sub">Drag and drop a PDF here, or <span class="browse">browse files</span></p>
+          <p class="dropzone-error" id="upload-error" role="alert" hidden></p>
+          <input type="file" id="file-input" accept="application/pdf,.pdf" hidden>
+        </div>
+
+        <!-- PDF viewer -->
+        <iframe id="pdf-viewer" class="pdf-viewer" title="Contract preview" hidden></iframe>
+      </div>
+    </section>
+
+    <!-- Right column: chat -->
+    <section class="panel chat-panel" aria-label="Chat">
+      <div class="panel-header stacked">
+        <h2>Ask about this contract</h2>
+        <p class="panel-sub">Type a question and press Send.</p>
+      </div>
+
+      <div class="messages" id="messages" role="log" aria-live="polite">
+        <div class="empty-state" id="empty-state">
+          <span class="empty-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>
+            </svg>
+          </span>
+          <p class="empty-title">No questions yet</p>
+          <p class="empty-sub">Upload a contract, then ask anything about it.</p>
+        </div>
+      </div>
+
+      <form class="chat-form" id="chat-form" autocomplete="off">
+        <input type="text" id="chat-input" placeholder="Type a question…"
+               aria-label="Your question">
+        <button type="submit" id="send-button" disabled>
+          Send
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
