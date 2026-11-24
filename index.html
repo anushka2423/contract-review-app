@@ -5,107 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contract Review</title>
   <!-- Optional web font; falls back to system fonts when offline -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="app-header">
+<div class="app">
+
+  <!-- Zone A: application shell -->
+  <header class="shell">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-          <path d="M14 3v5h5"/>
-          <path d="m9 14 2 2 4-4"/>
-        </svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>
       </span>
       <h1>Contract Review</h1>
     </div>
-    <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Answers from your contract</span>
+    <nav class="crumb" id="crumb" aria-label="Current document" hidden>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-doc" id="crumb-doc"></span>
+    </nav>
   </header>
 
-  <main class="layout">
-    <!-- Left column: contract -->
-    <section class="panel contract-panel" aria-label="Contract">
-      <div class="panel-header">
-        <div class="panel-title-group">
-          <h2>Contract</h2>
-          <span class="file-chip" id="file-chip" hidden>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-              <path d="M14 3v5h5"/>
-            </svg>
-            <span class="file-name" id="file-name"></span>
-            <span class="file-size" id="file-size"></span>
-          </span>
+  <!-- Small screens show one pane at a time -->
+  <div class="view-switch" role="group" aria-label="Choose a view">
+    <button type="button" class="view-btn" data-view="document" aria-pressed="true">Document</button>
+    <button type="button" class="view-btn" data-view="assistant" aria-pressed="false">Assistant</button>
+  </div>
+
+  <main class="layout" id="layout" data-view="document">
+
+    <!-- Zone B: document workspace -->
+    <section class="pane doc-pane" aria-label="Document">
+      <header class="pane-header doc-header">
+        <span class="file-tile" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+        </span>
+        <div class="doc-id">
+          <h2 class="doc-title" id="file-name">No contract loaded</h2>
+          <p class="doc-meta" id="file-size">PDF files only</p>
         </div>
-        <div class="panel-actions" id="file-actions" hidden>
-          <a class="text-button" id="open-link" href="#" target="_blank" rel="noopener">Open in new tab</a>
-          <button type="button" class="text-button" id="replace-file">Replace</button>
-          <button type="button" class="text-button danger" id="remove-file">Remove</button>
+        <span class="badge" id="doc-badge" hidden></span>
+        <div class="doc-actions" id="file-actions" hidden>
+          <a class="icon-btn" id="open-link" href="#" target="_blank" rel="noopener" aria-label="Open in new tab" title="Open in new tab">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          </a>
+          <button type="button" class="icon-btn" id="replace-file" aria-label="Replace contract" title="Replace contract">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+          </button>
+          <button type="button" class="icon-btn danger" id="remove-file" aria-label="Remove contract" title="Remove contract">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
         </div>
+      </header>
+
+      <!-- Indeterminate: the backend reports no progress -->
+      <div class="progress" id="doc-progress" role="progressbar" aria-label="Indexing contract" hidden><span></span></div>
+
+      <div class="banner" id="ingest-status" role="status" hidden>
+        <svg class="banner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        <span class="banner-text" id="ingest-text"></span>
+        <button type="button" class="btn btn-secondary" id="ingest-retry" hidden>Retry</button>
       </div>
 
-      <div class="contract-body" id="contract-body">
-        <!-- Upload area -->
-        <div class="dropzone" id="dropzone" tabindex="0" role="button"
-             aria-label="Upload a PDF contract">
-          <span class="dropzone-icon" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-              <path d="M14 3v5h5"/>
-              <path d="M12 17v-6"/>
-              <path d="m9.5 13.5 2.5-2.5 2.5 2.5"/>
-            </svg>
-          </span>
-          <p class="dropzone-title">Upload a contract</p>
-          <p class="dropzone-sub">Drag and drop a PDF here, or <span class="browse">browse files</span></p>
-          <p class="dropzone-error" id="upload-error" role="alert" hidden></p>
-          <input type="file" id="file-input" accept="application/pdf,.pdf" hidden>
+      <div class="doc-body" id="contract-body">
+
+        <!-- Front door: shown until a contract is loaded -->
+        <div class="empty-doc" id="empty-doc">
+          <div class="intro">
+            <h3>Ask questions about a contract</h3>
+            <p>Upload a PDF, then ask in plain language. Answers include the supporting contract text when it's found.</p>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a PDF contract">
+            <span class="dropzone-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 17v-6"/><path d="m9.5 13.5 2.5-2.5 2.5 2.5"/></svg>
+            </span>
+            <p class="dropzone-title">Upload a contract</p>
+            <p class="dropzone-sub">Drag a PDF here or browse</p>
+            <span class="btn btn-primary" aria-hidden="true">Choose PDF</span>
+            <p class="dropzone-error" id="upload-error" role="alert" hidden></p>
+            <input type="file" id="file-input" accept="application/pdf,.pdf" hidden>
+          </div>
+
+          <ol class="steps">
+            <li><span class="step-num" aria-hidden="true">1</span>Upload a PDF</li>
+            <li><span class="step-num" aria-hidden="true">2</span>Wait for indexing to finish</li>
+            <li><span class="step-num" aria-hidden="true">3</span>Ask your questions in the assistant</li>
+          </ol>
         </div>
 
-        <!-- PDF viewer -->
+        <!-- Reading canvas: the browser's PDF viewer keeps its own toolbar, thumbnails and zoom -->
         <iframe id="pdf-viewer" class="pdf-viewer" title="Contract preview" hidden></iframe>
+        <p class="viewer-fallback" id="viewer-fallback" hidden>Preview not showing? <a id="fallback-link" href="#" target="_blank" rel="noopener">Open in new tab</a></p>
       </div>
     </section>
 
-    <!-- Right column: chat -->
-    <section class="panel chat-panel" aria-label="Chat">
-      <div class="panel-header stacked">
-        <h2>Ask about this contract</h2>
-        <p class="panel-sub">Type a question and press Send.</p>
-      </div>
-
-      <div class="messages" id="messages" role="log" aria-live="polite">
-        <div class="empty-state" id="empty-state">
-          <span class="empty-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>
-            </svg>
-          </span>
-          <p class="empty-title">No questions yet</p>
-          <p class="empty-sub">Upload a contract, then ask anything about it.</p>
+    <!-- Zone C: assistant -->
+    <section class="pane assistant-pane" aria-label="Assistant">
+      <header class="pane-header">
+        <span class="assistant-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+        </span>
+        <div class="doc-id">
+          <h2 class="doc-title">Assistant</h2>
+          <p class="doc-meta">Ask about this contract</p>
         </div>
+        <span class="badge" id="assistant-badge">No contract</span>
+      </header>
+
+      <div class="thread">
+        <div class="messages" id="messages" role="log" aria-live="polite">
+          <div class="empty-state" id="empty-state">
+            <span class="empty-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+            </span>
+            <p class="empty-title" id="empty-title">Upload a contract to begin</p>
+            <p class="empty-sub" id="empty-sub">Add a PDF on the left. Once it's indexed, ask questions here.</p>
+            <div class="suggestions" id="suggestions" hidden>
+              <p class="suggestions-label">Suggested questions</p>
+              <button type="button" class="suggestion">Who are the parties to this agreement?</button>
+              <button type="button" class="suggestion">What are the payment terms?</button>
+              <button type="button" class="suggestion">How can this agreement be terminated?</button>
+              <button type="button" class="suggestion">Is there a limitation of liability?</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="jump" id="jump-latest" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          Jump to latest
+        </button>
       </div>
 
-      <form class="chat-form" id="chat-form" autocomplete="off">
-        <input type="text" id="chat-input" placeholder="Type a question…"
-               aria-label="Your question">
-        <button type="submit" id="send-button" disabled>
-          Send
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>
-          </svg>
-        </button>
+      <form class="composer" id="chat-form" autocomplete="off">
+        <div class="composer-box" id="composer-box">
+          <textarea id="chat-input" rows="1" placeholder="Upload a contract to start asking questions" aria-label="Your question" disabled></textarea>
+          <button type="submit" class="send-btn" id="send-button" aria-label="Send question" disabled>
+            <span class="send-label">Send</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+        <p class="composer-hint">Enter to send · Shift+Enter for a new line. AI-generated: verify against the contract.</p>
       </form>
     </section>
-  </main>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
