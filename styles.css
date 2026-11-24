@@ -31,6 +31,19 @@
   --bg-sunken: var(--grey-50);
   --bg-shell: var(--blue-900);
   --bg-inverse: var(--grey-900);
+  --bg-avatar: var(--blue-900);          /* assistant mark and avatar */
+  --bg-pressed: var(--grey-100);         /* pressed state of ghost controls */
+
+  /* Semantic: navy shell */
+  --border-shell: var(--blue-800);
+  --text-on-shell: var(--blue-100);
+  --text-on-shell-subtle: var(--blue-300);
+
+  /* Semantic: small details */
+  --brand-strong: var(--blue-900);       /* icon on the white brand mark */
+  --brand-subtle-border: var(--blue-100);
+  --scrollbar-thumb: var(--grey-200);
+  --indicator: var(--grey-400);          /* typing dots */
 
   /* Semantic: text */
   --text-primary: var(--grey-900);
@@ -152,7 +165,7 @@ ol {
   min-height: 56px;
   padding: 0 var(--space-6);
   background: var(--bg-shell);
-  border-bottom: 1px solid var(--blue-800);
+  border-bottom: 1px solid var(--border-shell);
 }
 
 .brand {
@@ -170,7 +183,7 @@ ol {
   justify-content: center;
   border-radius: var(--radius-md);
   background: var(--bg-surface);
-  color: var(--blue-900);
+  color: var(--brand-strong);
 }
 
 .brand h1 {
@@ -187,7 +200,7 @@ ol {
 }
 
 .crumb-sep {
-  color: var(--blue-300);
+  color: var(--text-on-shell-subtle);
 }
 
 .crumb-doc {
@@ -196,7 +209,7 @@ ol {
   text-overflow: ellipsis;
   white-space: nowrap;
   font: 500 14px/22px var(--font-sans);
-  color: var(--blue-100);
+  color: var(--text-on-shell);
 }
 
 /* Segmented view switch: small screens only */
@@ -302,7 +315,7 @@ ol {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--blue-900);
+  background: var(--bg-avatar);
   color: var(--text-inverse);
 }
 
@@ -402,7 +415,7 @@ ol {
 }
 
 .btn-secondary:active {
-  background: var(--grey-100);
+  background: var(--bg-pressed);
 }
 
 .btn:disabled {
@@ -435,7 +448,7 @@ ol {
 }
 
 .icon-btn:active {
-  background: var(--grey-100);
+  background: var(--bg-pressed);
 }
 
 .icon-btn.danger:hover {
@@ -592,16 +605,6 @@ ol {
   color: var(--text-secondary);
 }
 
-.dropzone .dropzone-error {
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--danger-border);
-  border-radius: var(--radius-md);
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  font: 500 13px/20px var(--font-sans);
-}
-
 .steps {
   width: 100%;
   max-width: 640px;
@@ -672,7 +675,7 @@ ol {
   padding: var(--space-6) var(--space-4);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--grey-200) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .messages::-webkit-scrollbar {
@@ -681,7 +684,7 @@ ol {
 
 .messages::-webkit-scrollbar-thumb {
   border-radius: var(--radius-sm);
-  background: var(--grey-200);
+  background: var(--scrollbar-thumb);
 }
 
 .empty-state {
@@ -756,7 +759,7 @@ ol {
 }
 
 .suggestion:active {
-  background: var(--grey-100);
+  background: var(--bg-pressed);
 }
 
 .jump {
@@ -802,7 +805,7 @@ ol {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--blue-900);
+  background: var(--bg-avatar);
   color: var(--text-inverse);
 }
 
@@ -830,7 +833,7 @@ ol {
 
 .message.user .bubble {
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--blue-100);
+  border: 1px solid var(--brand-subtle-border);
   border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
   background: var(--brand-subtle);
   font: 400 14px/22px var(--font-sans);
@@ -875,7 +878,7 @@ ol {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--grey-400);
+  background: var(--indicator);
   opacity: 0.4;
   animation: blink 1.1s infinite;
 }
@@ -940,6 +943,11 @@ ol {
   text-align: left;
   cursor: pointer;
   transition: background var(--ease-fast);
+}
+
+/* Draw the focus ring inside the row: .source clips anything outside its edge */
+.source-row:focus-visible {
+  outline-offset: -2px;
 }
 
 .source-row:hover {
@@ -1172,8 +1180,13 @@ ol {
   }
 
   .suggestion,
-  .source-row {
+  .source-row,
+  .reasoning-block summary {
     min-height: 44px;
+  }
+
+  .jump {
+    height: 44px;
   }
 
   .message-actions {
@@ -1214,6 +1227,11 @@ ol {
 
 /* Phone: icon-only send, safe-area aware composer, tighter front door */
 @media (max-width: 767px) {
+  /* Decorative tile: drop it so the file name keeps room beside the badge and actions */
+  .file-tile {
+    display: none;
+  }
+
   .empty-doc {
     padding: var(--space-6) var(--space-4);
   }

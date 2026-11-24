@@ -53,6 +53,7 @@
   var ingestController = null; // aborts an ingestion that is still running
   var ingestToken = 0; // lets a late response from a replaced upload be ignored
   var ingestState = ""; // "", "loading", "ready" or "error" (what the UI shows)
+  var pendingBlock = null; // the thread block of the question currently in flight
 
   /* ---------- Small helpers ---------- */
 
@@ -120,6 +121,8 @@
     if (!file) return;
     if (!isPdf(file)) {
       showError("That file isn't a PDF. Please choose a .pdf file.");
+      // Reset so choosing the same file again still fires a change event
+      fileInput.value = "";
       return;
     }
     showError("");
@@ -247,6 +250,13 @@
     if (ingestController) ingestController.abort();
     ingestController = null;
     contractReady = false;
+    // A question still loading belongs to the contract that just went away
+    if (pendingBlock) {
+      renderStale(pendingBlock);
+      pendingBlock = null;
+    }
+    busy = false;
+    chatForm.setAttribute("aria-busy", "false");
     updateChatAvailability();
   }
 
@@ -304,7 +314,10 @@
   }
 
   ingestRetry.addEventListener("click", function () {
-    if (currentFile) ingestContract(currentFile);
+    if (!currentFile) return;
+    ingestContract(currentFile);
+    // The Retry button hides itself; keep keyboard focus on a stable control
+    replaceBtn.focus();
   });
 
   function openPicker() {
@@ -353,9 +366,13 @@
     if (file && (isPdf(file) || viewer.hidden)) loadFile(file);
   });
 
-  // Stop the browser from navigating to a PDF dropped outside the pane
-  window.addEventListener("dragover", function (e) { e.preventDefault(); });
-  window.addEventListener("drop", function (e) { e.preventDefault(); });
+  // Stop the browser from navigating to a file dropped outside the pane.
+  // Only file drags are cancelled, so selected text can still be dropped into the chat box.
+  function hasFiles(e) {
+    return !!e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], "Files") !== -1;
+  }
+  window.addEventListener("dragover", function (e) { if (hasFiles(e)) e.preventDefault(); });
+  window.addEventListener("drop", function (e) { if (hasFiles(e)) e.preventDefault(); });
 
   replaceBtn.addEventListener("click", openPicker);
   removeBtn.addEventListener("click", clearFile);
@@ -454,6 +471,14 @@
     retry.textContent = "Retry";
     retry.addEventListener("click", onRetry);
     m.bubble.appendChild(retry);
+    settle(stick);
+  }
+
+  // A late answer for a contract that was replaced or removed is never shown as current
+  function renderStale(m) {
+    var stick = nearBottom();
+    m.bubble.className = "bubble error";
+    m.bubble.textContent = "This question was for a contract that has since been replaced or removed. Ask it again about the current contract.";
     settle(stick);
   }
 
@@ -571,15 +596,24 @@
     copy.setAttribute("aria-label", "Copy answer");
     copy.title = "Copy answer";
     copy.appendChild(icon(ICONS.copy, 16));
-    copy.addEventListener("click", function () {
-      navigator.clipboard.writeText(text).then(function () {
+    // Show the outcome briefly, including to screen readers via the label, then restore
+    function flash(label, path) {
+      copy.textContent = "";
+      copy.appendChild(icon(path, 16));
+      copy.setAttribute("aria-label", label);
+      copy.title = label;
+      setTimeout(function () {
         copy.textContent = "";
-        copy.appendChild(icon(ICONS.check, 16));
-        setTimeout(function () {
-          copy.textContent = "";
-          copy.appendChild(icon(ICONS.copy, 16));
-        }, 1500);
-      });
+        copy.appendChild(icon(ICONS.copy, 16));
+        copy.setAttribute("aria-label", "Copy answer");
+        copy.title = "Copy answer";
+      }, 1500);
+    }
+    copy.addEventListener("click", function () {
+      navigator.clipboard.writeText(text).then(
+        function () { flash("Copied", ICONS.check); },
+        function () { flash("Copy failed", ICONS.copy); } // blocked by the browser: say so, don't throw
+      );
     });
     actions.appendChild(copy);
     return actions;
@@ -680,21 +714,35 @@
 
   // Runs one question through the chat webhook; `block` is reused when retrying
   function runQuestion(text, block) {
+    var token = ingestToken; // which contract this question is about
     setBusy(true);
     var pending = block || addTyping();
     if (block) showTyping(pending);
+    pendingBlock = pending;
 
     askWebhook(text)
       .then(function (data) {
+        if (token !== ingestToken) return renderStale(pending);
         renderAnswer(pending, data);
       })
       .catch(function (err) {
+        if (token !== ingestToken) return renderStale(pending);
         renderError(pending, friendlyError(err), function () {
-          if (busy || !contractReady) return;
+          // A Retry on an answer from an earlier contract must not hit the new one
+          if (busy) return;
+          if (token !== ingestToken || !contractReady) {
+            renderStale(pending);
+            return;
+          }
           runQuestion(text, pending);
+          // The Retry button is replaced by the typing indicator; keep focus somewhere stable
+          chatInput.focus();
         });
       })
       .finally(function () {
+        // If the contract changed meanwhile, cancelIngestion already reset the chat state
+        if (token !== ingestToken) return;
+        pendingBlock = null;
         setBusy(false);
         chatInput.focus();
       });

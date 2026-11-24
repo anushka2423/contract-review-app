@@ -66,6 +66,9 @@
         <button type="button" class="btn btn-secondary" id="ingest-retry" hidden>Retry</button>
       </div>
 
+      <!-- Outside the upload button so assistive tech announces it, and visible even once a contract is loaded -->
+      <p class="banner" id="upload-error" role="alert" hidden></p>
+
       <div class="doc-body" id="contract-body">
 
         <!-- Front door: shown until a contract is loaded -->
@@ -82,7 +85,6 @@
             <p class="dropzone-title">Upload a contract</p>
             <p class="dropzone-sub">Drag a PDF here or browse</p>
             <span class="btn btn-primary" aria-hidden="true">Choose PDF</span>
-            <p class="dropzone-error" id="upload-error" role="alert" hidden></p>
             <input type="file" id="file-input" accept="application/pdf,.pdf" hidden>
           </div>
 
